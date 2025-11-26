@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cigautrom.</title>
+    <title>Cigautrom</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
@@ -16,10 +16,11 @@
             --active-heart: #ff3b30;
         }
 
-        html {
-            /* Хак для iOS, чтобы сложнее было свайпнуть вниз для закрытия */
+        /* ХАК ДЛЯ iOS: ЧТОБЫ НЕ СЛЕТАЛО ПРИ СВАЙПЕ */
+        html, body {
             height: 100%;
-            overflow: hidden;
+            overflow-y: scroll; /* Всегда показывать скролл, даже если мало контента */
+            -webkit-overflow-scrolling: touch;
         }
 
         body { 
@@ -28,66 +29,32 @@
             color: var(--text); 
             margin: 0; 
             padding: 0; 
-            padding-bottom: 100px; 
+            /* ГИГАНТСКИЙ ОТСТУП СНИЗУ, ЧТОБЫ ТОВАРЫ НЕ ПРЯТАЛИСЬ ЗА МЕНЮ */
+            padding-bottom: 140px; 
             -webkit-tap-highlight-color: transparent; 
-            
-            /* Важные настройки скролла */
-            height: 100%;
-            overflow-y: scroll; 
-            -webkit-overflow-scrolling: touch;
         }
         
         ::-webkit-scrollbar { display: none; }
 
-        /* --- ШАПКА С ОГРОМНЫМ ОТСТУПОМ --- */
-        .header { 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            background: rgba(28,28,30,0.98); 
-            border-bottom: 0.5px solid rgba(255,255,255,0.1);
-            
-            /* ВОТ ОН, БОЛЬШОЙ ОТСТУП (50px) ЧТОБЫ НЕ НАЛЕЗАЛО */
-            padding-top: calc(50px + env(safe-area-inset-top)); 
-            padding-bottom: 12px;
+        /* --- ПАНЕЛЬ ФИЛЬТРОВ (ПРИЛИПАЕТ К ВЕРХУ) --- */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--bg);
+            /* ТУТ УВЕЛИЧИЛ ОТСТУП СВЕРХУ (Было 10, стало 20 + safe area) */
+            padding-top: 20px; 
+            padding-bottom: 15px;
+            border-bottom: 0.5px solid rgba(128,128,128,0.1);
         }
 
-        /* ВЕРХНЯЯ СТРОКА: ЛОГО + НАЗВАНИЕ */
-        .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            position: relative;
-            height: 32px;
-        }
-
-        .brand-logo {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            position: absolute;
-            left: 15px;
-            background: #333;
-        }
-
-        .app-title { 
-            font-weight: 700; 
-            font-size: 20px; 
-            letter-spacing: -0.5px; 
-            color: #fff;
-        }
-        .dot-accent { color: var(--text); }
-
-        /* ФИЛЬТРЫ */
-        .filters-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 12px; align-items: center; scrollbar-width: none; }
+        .filters-row { display: flex; gap: 6px; overflow-x: auto; padding: 0 12px; align-items: center; scrollbar-width: none; }
         .filters-row::-webkit-scrollbar { display: none; }
         
-        .pill { background: var(--card-bg); color: var(--text); border: none; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
+        .pill { background: var(--card-bg); color: var(--text); border: none; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
         .pill.active { background: var(--text); color: var(--bg); }
         
-        .sort-wrapper { position: relative; width: 44px; height: 36px; background: var(--card-bg); border-radius: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: -2px; }
+        .sort-wrapper { position: relative; width: 40px; height: 32px; background: var(--card-bg); border-radius: 17px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: -2px; }
         .sort-icon { font-size: 18px; color: var(--text); pointer-events: none; font-weight: 300; }
         .sort-select { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 10; cursor: pointer; }
 
@@ -95,22 +62,22 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 10px; align-items: start; }
         .card { display: flex; flex-direction: column; position: relative; width: 100%; }
         
-        .card-slider { width: 100%; aspect-ratio: 1 / 1; border-radius: 16px; overflow-x: auto; overflow-y: hidden; display: flex; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; background: var(--card-bg); position: relative;}
+        .card-slider { width: 100%; aspect-ratio: 1 / 1; border-radius: 14px; overflow-x: auto; overflow-y: hidden; display: flex; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; background: var(--card-bg); position: relative;}
         .card-slide { min-width: 100%; height: 100%; scroll-snap-align: center; }
         .card-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
         
         .dots-row { display: flex; justify-content: center; gap: 4px; margin-top: 8px; margin-bottom: 4px; height: 6px;}
         .c-dot { width: 5px; height: 5px; background: #3a3a3c; border-radius: 50%; }
-        .c-dot.active { background: #ffffff; }
+        .c-dot.active { background: var(--text); }
 
         .card-info { padding: 0 2px; margin-top: 2px; }
-        .price { font-weight: 700; font-size: 16px; color: #fff; line-height: 1.2; margin-bottom: 4px; }
+        .price { font-weight: 700; font-size: 16px; color: var(--text); line-height: 1.2; margin-bottom: 4px; }
         
-        /* ЖИРНОСТЬ 600 */
+        /* ШРИФТ ЖИРНЫЙ (600) */
         .name { 
             font-size: 14px; 
             font-weight: 600; 
-            color: #d1d1d6; 
+            color: var(--hint); 
             line-height: 1.3; 
             display: -webkit-box; 
             -webkit-line-clamp: 2; 
@@ -119,7 +86,7 @@
             height: 36px; 
         }
         
-        .fav-icon-svg { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); cursor: pointer; transition: transform 0.1s; }
+        .fav-icon-svg { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); cursor: pointer; transition: transform 0.1s; }
         .fav-icon-svg:active { transform: scale(0.8); }
         .fav-icon-svg path { fill: rgba(0,0,0,0.3); stroke: white; stroke-width: 1.5; transition: fill 0.2s, stroke 0.2s; }
         .fav-icon-svg.liked path { fill: var(--active-heart); stroke: var(--active-heart); }
@@ -129,7 +96,7 @@
         /* --- СТАТЬЯ --- */
         .article-view { padding: 20px; display: none; animation: fadeIn 0.3s; }
         .article-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; line-height: 1.3; }
-        .article-text { font-size: 16px; line-height: 1.6; color: #d1d1d6; white-space: pre-wrap; }
+        .article-text { font-size: 16px; line-height: 1.6; color: var(--hint); white-space: pre-wrap; }
         .article-btn-container { margin-top: 30px; }
 
         /* --- MODAL --- */
@@ -149,12 +116,12 @@
 
         .modal-content { flex: 1; padding: 16px 20px; overflow-y: auto; }
         .m-header { margin-bottom: 15px; margin-top: 5px; }
-        .m-price { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: -0.5px;}
-        .m-name { font-size: 18px; font-weight: 400; line-height: 1.4; color: #d1d1d6; }
-        .separator { height: 1px; background: rgba(255,255,255,0.1); width: 100%; margin: 15px 0; }
-        .m-desc { color: #fff; font-size: 15px; line-height: 1.6; white-space: pre-wrap; opacity: 0.9; }
+        .m-price { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; letter-spacing: -0.5px;}
+        .m-name { font-size: 18px; font-weight: 400; line-height: 1.4; color: var(--hint); }
+        .separator { height: 1px; background: rgba(128,128,128,0.2); width: 100%; margin: 15px 0; }
+        .m-desc { color: var(--hint); font-size: 15px; line-height: 1.6; white-space: pre-wrap; opacity: 0.9; }
 
-        .modal-actions { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.05); background: var(--bg); padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+        .modal-actions { padding: 12px 16px; border-top: 1px solid rgba(128,128,128,0.1); background: var(--bg); padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
         .btn-main { display: flex; width: 100%; background: var(--link); color: white; height: 50px; border-radius: 14px; align-items: center; justify-content: center; font-weight: 600; text-decoration: none; font-size: 16px; }
 
         /* --- LIGHTBOX --- */
@@ -167,11 +134,11 @@
         .lb-counter { position: absolute; top: 50px; left: 20px; color: white; font-weight: 600; font-size: 16px; z-index: 210;}
 
         /* --- TAB BAR --- */
-        .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1c1c1e; border-top: 0.5px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; padding-top: 10px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 80; }
+        .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg); border-top: 0.5px solid rgba(128,128,128,0.2); display: flex; justify-content: space-around; padding-top: 10px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 80; }
         .tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--hint); width: 50%; cursor: pointer;}
-        .tab-item.active { color: #fff; }
+        .tab-item.active { color: var(--text); }
         .tab-icon svg { width: 26px; height: 26px; fill: none; stroke: var(--hint); stroke-width: 2; transition: stroke 0.2s; }
-        .tab-item.active .tab-icon svg { stroke: #fff; }
+        .tab-item.active .tab-icon svg { stroke: var(--text); }
         
         .hidden { display: none !important; }
 
@@ -195,6 +162,8 @@
             white-space: nowrap;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
     </style>
 </head>
 <body>
@@ -208,12 +177,8 @@
     </div>
 
     <div id="screen-home">
-        <div class="header">
-            <div class="top-bar">
-                <img id="brand-logo" class="brand-logo" src="" style="display:none">
-                <div class="app-title">Cigautrom<span class="dot-accent">.</span></div>
-            </div>
-
+        
+        <div class="sticky-header">
             <div class="filters-row">
                 <div class="sort-wrapper">
                     <div class="sort-icon">⇅</div>
@@ -257,8 +222,8 @@
     </div>
 
     <div id="screen-fav" class="hidden">
-        <div class="header">
-            <div class="app-title">Избранное</div>
+        <div class="sticky-header" style="padding-top: 30px; text-align: center;">
+            <div style="font-weight: 700; font-size: 18px; color: white;">Избранное</div>
         </div>
         <div class="grid" id="fav-grid"></div>
     </div>
@@ -305,25 +270,19 @@
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.ready();
+        
+        // СНАЧАЛА РАСКРЫВАЕМ, ПОТОМ ВСЕ ОСТАЛЬНОЕ
         tg.expand();
-        tg.enableClosingConfirmation(); // ЗАЩИТА ОТ ЗАКРЫТИЯ
+        
+        // ВКЛЮЧАЕМ ЗАЩИТУ ОТ СВАЙПА (ЧТОБЫ НЕ СЛЕТАЛО)
+        tg.enableClosingConfirmation(); 
 
-        // Используем наши премиум цвета
+        // КРАСИМ СИСТЕМНУЮ ШАПКУ В ЧЕРНЫЙ (Чтобы сливалась)
         tg.setHeaderColor('#1c1c1e'); 
         tg.setBackgroundColor('#1c1c1e');
 
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlz9ch-Zo9aFoJmlDbwpnHsIbUusWYja-1onKKlWEWifL21ApHup5nRz9QizS68fKTaJWHHIZOurOW/pub?gid=0&single=true&output=csv';
         const myNick = 'dremalovo'; 
-        
-        // ВСТАВЬ СЮДА ССЫЛКУ НА ЛОГОТИП
-        const logoUrl = ""; 
-
-        if(logoUrl) {
-            const logo = document.getElementById('brand-logo');
-            logo.src = logoUrl;
-            logo.style.display = 'block';
-        }
 
         let products = [];
         let currentCategory = 'all';
