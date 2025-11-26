@@ -18,7 +18,7 @@
             --active-heart: #ff3b30;
         }
 
-        /* ГЛОБАЛЬНЫЕ НАСТРОЙКИ */
+        /* ГЛОБАЛЬНЫЕ НАСТРОЙКИ (КАК В V30) */
         html, body { 
             height: 100%; 
             overflow: hidden; 
@@ -26,33 +26,25 @@
             color: var(--text); 
             margin: 0; 
             padding: 0; 
-            -webkit-tap-highlight-color: transparent;
-            /* ЖЕСТКИЙ ШРИФТ: ЧТОБЫ У ВСЕХ БЫЛО КРАСИВО */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            /* ТОТ САМЫЙ ШРИФТ ИЗ V30 */
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
         }
         
         ::-webkit-scrollbar { display: none; }
 
-        /* --- УНИВЕРСАЛЬНЫЙ КОНТЕЙНЕР СКРОЛЛА --- */
+        /* --- УНИВЕРСАЛЬНЫЙ КОНТЕЙНЕР С ХАКОМ (ЧТОБЫ НЕ ЗАКРЫВАЛОСЬ) --- */
         .scroll-container {
             height: 100%;
-            overflow-y: scroll; /* ВСЕГДА ВКЛЮЧЕН СКРОЛЛ */
+            overflow-y: scroll; 
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 120px; /* Место под таббар */
+            padding-bottom: 120px; /* Место под меню */
             box-sizing: border-box;
-            position: absolute;
-            top: 0; left: 0; width: 100%;
+            position: absolute; top: 0; left: 0; width: 100%;
         }
-
-        /* ГЛАВНЫЙ ХАК: ДЕЛАЕМ КОНТЕНТ ВСЕГДА БОЛЬШЕ ЭКРАНА НА 1px */
+        /* Хак: Растягиваем контент на 101% высоты */
         .scroll-container::after {
-            content: "";
-            display: block;
-            height: 101%; /* Растягиваем контент, чтобы появился скролл */
-            width: 1px;
-            position: absolute;
-            top: 0;
-            z-index: -1;
+            content: ""; display: block; height: 1px; width: 100%; min-height: calc(100% + 1px);
         }
 
         /* --- ШАПКА --- */
@@ -83,7 +75,7 @@
         .filters-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 15px; align-items: center; scrollbar-width: none; }
         .filters-row::-webkit-scrollbar { display: none; }
         
-        .pill { background: var(--card-bg); color: var(--text); border: none; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
+        .pill { background: var(--card-bg); color: var(--text); border: none; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
         .pill.active { background: var(--text); color: var(--bg); }
         
         .sort-wrapper { position: relative; width: 44px; height: 36px; background: var(--card-bg); border-radius: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: -2px; }
@@ -91,7 +83,7 @@
         .sort-select { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 10; cursor: pointer; }
 
         /* --- СЕТКА --- */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 15px 10px; align-items: start; position: relative; z-index: 2; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 15px 10px; align-items: start; }
         .card { display: flex; flex-direction: column; position: relative; width: 100%; }
         
         .card-slider { width: 100%; aspect-ratio: 1 / 1; border-radius: 16px; overflow-x: auto; overflow-y: hidden; display: flex; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; background: var(--card-bg); position: relative;}
@@ -114,7 +106,7 @@
         .badge-new { position: absolute; top: 8px; left: 8px; background: #30d158; color: #000; font-size: 10px; font-weight: 800; padding: 4px 6px; border-radius: 6px; z-index: 10; pointer-events: none; }
 
         /* --- СТАТЬЯ --- */
-        .article-view { padding: 20px; display: none; animation: fadeIn 0.3s; position: relative; z-index: 2; }
+        .article-view { padding: 20px; display: none; animation: fadeIn 0.3s; padding-bottom: 150px; position: relative; z-index: 2;}
         .article-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; line-height: 1.3; }
         .article-text { font-size: 16px; line-height: 1.6; color: #d1d1d6; white-space: pre-wrap; }
         .article-btn-container { margin-top: 30px; }
@@ -128,22 +120,27 @@
         }
         .modal.open { transform: translateX(0); }
         
-        /* ВНУТРЕННИЙ СКРОЛЛ ТОВАРА ТОЖЕ С ХАКОМ */
+        /* ВНУТРЕННИЙ СКРОЛЛ ТОВАРА (V30 + ХАК) */
         .modal-scroll-area {
             flex: 1; 
             overflow-y: scroll; 
             -webkit-overflow-scrolling: touch;
-            padding-top: calc(120px + env(safe-area-inset-top));
+            /* Запрет всплытия скролла */
+            overscroll-behavior-y: contain; 
+            
+            /* Отступ сверху */
+            padding-top: calc(60px + env(safe-area-inset-top));
             padding-left: 20px; padding-right: 20px; padding-bottom: 20px;
         }
-        /* Хак для модалки: контент длиннее экрана */
+        /* РАСПОРКА ВНУТРИ ТОВАРА */
         .modal-scroll-area::after {
-            content: ""; display: block; height: 101%; width: 1px; position: absolute; top: 0; z-index: -1;
+            content: ""; display: block; height: 1px; min-height: calc(100% + 1px); width: 100%;
         }
 
         .gallery-container { 
             position: relative; width: 100%; padding-top: 100%; 
-            background: #000; overflow: hidden; border-radius: 24px; margin-top: 0; 
+            background: #000; overflow: hidden; border-radius: 24px; 
+            margin-top: 0; 
         }
         .gallery-track { position: absolute; top: 0; left: 0; height: 100%; display: flex; transition: transform 0.3s ease-out; }
         .gallery-item { min-width: 100%; width: 100%; height: 100%; position: relative; }
@@ -161,6 +158,7 @@
         .separator { height: 1px; background: rgba(255,255,255,0.1); width: 100%; margin: 15px 0; }
         .m-desc { color: #fff; font-size: 15px; line-height: 1.6; white-space: pre-wrap; opacity: 0.9; padding-bottom: 20px; }
 
+        /* КНОПКА ФИКСИРОВАНА */
         .modal-actions { 
             flex-shrink: 0; padding: 15px 16px; 
             border-top: 1px solid rgba(255,255,255,0.05); 
@@ -168,9 +166,23 @@
             padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
             z-index: 101;
         }
-        .btn-main { display: flex; width: 100%; background: var(--link); color: white; height: 50px; border-radius: 14px; align-items: center; justify-content: center; font-weight: 600; text-decoration: none; font-size: 16px; }
+        /* ДЕЛАЕМ КНОПКУ ОБЫЧНЫМ БЛОКОМ DIV, ЧТОБЫ ССЫЛКА РАБОТАЛА ЧЕРЕЗ JS */
+        .btn-main { 
+            display: flex; 
+            width: 100%; 
+            background: var(--link); 
+            color: white; 
+            height: 50px; 
+            border-radius: 14px; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 600; 
+            text-decoration: none; 
+            font-size: 16px; 
+            cursor: pointer;
+        }
 
-        /* --- LIGHTBOX --- */
+        /* --- LIGHTBOX (ЗУМ) --- */
         .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 200; display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s; }
         .lightbox.show { display: flex; opacity: 1; }
         .lb-track { display: flex; height: 100%; transition: transform 0.3s ease-out; }
@@ -247,13 +259,13 @@
 Доставка занимает от 10 до 21 дня до момента отправки СДЭКом.</div>
             
             <div class="article-btn-container">
-                <a href="https://t.me/dremalovo" class="btn-main">Связаться с нами</a>
+                <div class="btn-main" onclick="tg.openTelegramLink('https://t.me/dremalovo')">Связаться с нами</div>
             </div>
         </div>
     </div>
 
     <div id="screen-fav" class="scroll-container hidden">
-        <div class="header">
+        <div class="header" style="display:flex; justify-content:center;">
             <div class="app-title">Избранное</div>
         </div>
         <div class="grid" id="fav-grid"></div>
@@ -280,7 +292,7 @@
         </div>
         
         <div class="modal-actions">
-            <a href="#" id="m-buy-btn" class="btn-main">Написать продавцу</a>
+            <div id="m-buy-btn" class="btn-main">Написать продавцу</div>
         </div>
     </div>
 
@@ -405,11 +417,10 @@
         window.showArticle = function(btn) {
             document.querySelectorAll('.pill').forEach(el=>el.classList.remove('active'));
             btn.classList.add('active');
-            // Прячем все контейнеры
-            document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
-            // Показываем главный, чтобы шапка осталась
-            document.getElementById('screen-home').classList.remove('hidden');
             
+            document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
+            document.getElementById('screen-home').classList.remove('hidden');
+
             document.getElementById('catalog').classList.add('hidden');
             document.getElementById('article-view').classList.remove('hidden');
             document.getElementById('article-view').style.display = 'block';
@@ -441,7 +452,12 @@
             
             const firstImg = p.images ? p.images.split(',')[0].trim() : '';
             const text = `Привет! Хочу купить ${p.name} (${firstImg})`;
-            document.getElementById('m-buy-btn').href = `https://t.me/${myNick}?text=${encodeURIComponent(text)}`;
+            
+            // ИСПРАВЛЕНИЕ: КНОПКА ТЕПЕРЬ DIV С ONCLICK СОБЫТИЕМ (БЕЗ HREF)
+            const btn = document.getElementById('m-buy-btn');
+            btn.onclick = function() {
+                tg.openTelegramLink(`https://t.me/${myNick}?text=${encodeURIComponent(text)}`);
+            };
             
             updateModalFavIcon();
             renderModalGallery();
@@ -605,7 +621,7 @@
             document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            // Прячем все контейнеры
+            // СКРЫВАЕМ ВСЕ ЭКРАНЫ
             document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
             
             if (tab === 'home') {
