@@ -18,11 +18,10 @@
             --active-heart: #ff3b30;
         }
 
-        /* ГЛОБАЛЬНЫЕ НАСТРОЙКИ (КАК В V30) */
+        /* ГЛОБАЛЬНЫЕ НАСТРОЙКИ: БЛОКИРУЕМ ЗАКРЫТИЕ НА УРОВНЕ HTML */
         html { height: 100%; overflow: hidden; }
         
         body { 
-            /* ТОТ САМЫЙ ШРИФТ ИЗ V30 */
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; 
             background-color: var(--bg); 
             color: var(--text); 
@@ -35,21 +34,26 @@
         
         ::-webkit-scrollbar { display: none; }
 
-        /* --- ГЛАВНЫЙ СКРОЛЛ --- */
+        /* --- УНИВЕРСАЛЬНЫЙ СКРОЛЛ-КОНТЕЙНЕР (РАБОТАЕТ ВЕЗДЕ) --- */
         .scroll-container {
             height: 100%;
-            overflow-y: scroll; 
+            overflow-y: scroll; /* Принудительный скролл */
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior-y: contain;
-            padding-bottom: 120px; 
-            box-sizing: border-box;
-            position: absolute; top: 0; left: 0; width: 100%;
+            overscroll-behavior-y: contain; /* Скролл остается внутри */
+            position: relative;
         }
-        
-        /* ХАК ДЛЯ ГЛАВНОЙ СТРАНИЦЫ */
-        .scroll-container::after {
-            content: ""; display: block; height: 1px; width: 100%; min-height: 1px;
+
+        /* ХАК: ДЕЛАЕМ КОНТЕНТ ВСЕГДА ДЛИННЕЕ ЭКРАНА НА 1px */
+        /* Это заставляет Телеграм думать, что страницу можно листать, и отключает закрытие */
+        .force-scroll::after {
+            content: "";
+            display: block;
+            height: 2px; /* Распорка */
+            width: 100%;
         }
+
+        /* ОТСТУП СНИЗУ ДЛЯ ГЛАВНОЙ */
+        .main-padding { padding-bottom: 150px; }
 
         /* --- ШАПКА --- */
         .header { 
@@ -87,7 +91,7 @@
         .sort-select { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 10; cursor: pointer; }
 
         /* --- СЕТКА --- */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 15px 10px; align-items: start; position: relative; z-index: 2; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 15px 10px; align-items: start; }
         .card { display: flex; flex-direction: column; position: relative; width: 100%; }
         
         .card-slider { width: 100%; aspect-ratio: 1 / 1; border-radius: 16px; overflow-x: auto; overflow-y: hidden; display: flex; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; background: var(--card-bg); position: relative;}
@@ -110,35 +114,37 @@
         .badge-new { position: absolute; top: 8px; left: 8px; background: #30d158; color: #000; font-size: 10px; font-weight: 800; padding: 4px 6px; border-radius: 6px; z-index: 10; pointer-events: none; }
 
         /* --- СТАТЬЯ --- */
-        .article-view { padding: 20px; display: none; animation: fadeIn 0.3s; position: relative; z-index: 2; padding-bottom: 150px;}
+        .article-view { padding: 20px; display: none; animation: fadeIn 0.3s; }
         .article-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; line-height: 1.3; }
         .article-text { font-size: 16px; line-height: 1.6; color: #d1d1d6; white-space: pre-wrap; }
         .article-btn-container { margin-top: 30px; }
 
-        /* --- MODAL (ТОВАР) - FIXED STRUCTURE --- */
+        /* --- MODAL (ТОВАР) --- */
         .modal { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--bg); z-index: 100; 
             transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.1, 0.7, 0.1, 1); 
-            display: flex; flex-direction: column; /* ВАЖНО ДЛЯ КНОПКИ ВНИЗУ */
+            display: flex; flex-direction: column; 
         }
         .modal.open { transform: translateX(0); }
         
-        /* ЗОНА СКРОЛЛА ВНУТРИ ТОВАРА (ВЕРХНЯЯ ЧАСТЬ) */
+        /* ЗОНА СКРОЛЛА ВНУТРИ ТОВАРА */
         .modal-scroll-area {
-            flex: 1; /* Занимает всё свободное место */
+            flex: 1; 
             overflow-y: scroll; 
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior-y: contain; /* ЧТОБЫ НЕ ЗАКРЫВАЛОСЬ */
+            overscroll-behavior-y: contain; /* ВАЖНО */
             
-            /* ОТСТУП СВЕРХУ 80px + челка */
-            padding-top: calc(80px + env(safe-area-inset-top));
+            padding-top: calc(120px + env(safe-area-inset-top)); /* Большой отступ */
             padding-left: 20px; padding-right: 20px; padding-bottom: 20px;
         }
         
-        /* ХАК ДЛЯ ТОВАРА (ЧТОБЫ ВСЕГДА БЫЛ СКРОЛЛ) */
+        /* ХАК ДЛЯ ТОВАРА: РАСПОРКА, ЧТОБЫ БЫЛ СКРОЛЛ */
         .modal-scroll-area::after {
-            content: ""; display: block; height: 2px; width: 100%;
+            content: "";
+            display: block;
+            height: 2px; /* Микро-высота, чтобы контент был больше экрана */
+            width: 100%;
         }
 
         .gallery-container { 
@@ -162,10 +168,8 @@
         .separator { height: 1px; background: rgba(255,255,255,0.1); width: 100%; margin: 15px 0; }
         .m-desc { color: #fff; font-size: 15px; line-height: 1.6; white-space: pre-wrap; opacity: 0.9; padding-bottom: 20px; }
 
-        /* КНОПКА (ПРИКЛЕЕНА К НИЗУ) */
         .modal-actions { 
-            flex-shrink: 0; /* Не сжимается */
-            padding: 15px 16px; 
+            flex-shrink: 0; padding: 15px 16px; 
             border-top: 1px solid rgba(255,255,255,0.05); 
             background: var(--bg); 
             padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
@@ -173,16 +177,14 @@
         }
         .btn-main { display: flex; width: 100%; background: var(--link); color: white; height: 50px; border-radius: 14px; align-items: center; justify-content: center; font-weight: 600; text-decoration: none; font-size: 16px; }
 
-        /* --- LIGHTBOX (ЗУМ) --- */
+        /* --- LIGHTBOX --- */
         .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 200; display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s; }
         .lightbox.show { display: flex; opacity: 1; }
         .lb-track { display: flex; height: 100%; transition: transform 0.3s ease-out; }
         .lb-item { min-width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; }
         .lb-item img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        /* КРЕСТИК НИЖЕ (120px) */
-        .close-zoom { position: absolute; top: 120px; right: 20px; width: 44px; height: 44px; background: rgba(50,50,50,0.8); border-radius: 50%; color: white; font-size: 28px; display: flex; align-items: center; justify-content: center; z-index: 210; cursor: pointer; font-weight: 300; }
-        .lb-counter { position: absolute; top: 130px; left: 20px; color: white; font-weight: 600; font-size: 16px; z-index: 210;}
+        .close-zoom { position: absolute; top: 140px; right: 20px; width: 44px; height: 44px; background: rgba(50,50,50,0.8); border-radius: 50%; color: white; font-size: 28px; display: flex; align-items: center; justify-content: center; z-index: 210; cursor: pointer; font-weight: 300; }
+        .lb-counter { position: absolute; top: 150px; left: 20px; color: white; font-weight: 600; font-size: 16px; z-index: 210;}
 
         /* --- TAB BAR --- */
         .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1c1c1e; border-top: 0.5px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; padding-top: 10px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 80; }
@@ -208,40 +210,41 @@
         <div class="lb-track" id="lb-track"></div>
     </div>
 
-    <div id="screen-home" class="scroll-container">
-        <div class="header">
-            <div class="top-bar">
-                <img id="brand-logo" class="brand-logo" src="" style="display:none">
-                <div class="app-title">Cigautrom<span class="dot-accent">.</span></div>
-            </div>
-
-            <div class="filters-row">
-                <div class="sort-wrapper">
-                    <div class="sort-icon">⇅</div>
-                    <select class="sort-select" onchange="applySort(this.value)">
-                        <option value="new">Сначала новые</option>
-                        <option value="asc">Сначала дешевые</option>
-                        <option value="desc">Сначала дорогие</option>
-                        <option value="avito">С Авитодоставкой</option>
-                    </select>
+    <div id="screen-home" class="scroll-container force-scroll">
+        <div class="main-padding">
+            <div class="header">
+                <div class="top-bar">
+                    <img id="brand-logo" class="brand-logo" src="" style="display:none">
+                    <div class="app-title">Cigautrom<span class="dot-accent">.</span></div>
                 </div>
-                <button class="pill active" onclick="setCategory('all', this)">Все</button>
-                <button class="pill" onclick="setCategory('bags', this)">Сумки</button>
-                <button class="pill" onclick="showArticle(this)">Под заказ</button>
-                <button class="pill" onclick="setCategory('jackets', this)">Куртки</button>
-                <button class="pill" onclick="setCategory('tshirts', this)">Кофты / Футболки</button>
-                <button class="pill" onclick="setCategory('accessories', this)">Аксессуары</button>
-                <button class="pill" onclick="setCategory('shoes', this)">Обувь</button>
+
+                <div class="filters-row">
+                    <div class="sort-wrapper">
+                        <div class="sort-icon">⇅</div>
+                        <select class="sort-select" onchange="applySort(this.value)">
+                            <option value="new">Сначала новые</option>
+                            <option value="asc">Сначала дешевые</option>
+                            <option value="desc">Сначала дорогие</option>
+                            <option value="avito">С Авитодоставкой</option>
+                        </select>
+                    </div>
+                    <button class="pill active" onclick="setCategory('all', this)">Все</button>
+                    <button class="pill" onclick="setCategory('bags', this)">Сумки</button>
+                    <button class="pill" onclick="showArticle(this)">Под заказ</button>
+                    <button class="pill" onclick="setCategory('jackets', this)">Куртки</button>
+                    <button class="pill" onclick="setCategory('tshirts', this)">Кофты / Футболки</button>
+                    <button class="pill" onclick="setCategory('accessories', this)">Аксессуары</button>
+                    <button class="pill" onclick="setCategory('shoes', this)">Обувь</button>
+                </div>
             </div>
-        </div>
 
-        <div class="grid" id="catalog">
-            <div style="grid-column: span 2; text-align: center; padding: 40px; color: var(--hint);">Загрузка...</div>
-        </div>
+            <div class="grid" id="catalog">
+                <div style="grid-column: span 2; text-align: center; padding: 40px; color: var(--hint);">Загрузка...</div>
+            </div>
 
-        <div id="article-view" class="article-view hidden">
-            <div class="article-title">Как оформить сумку под заказ ?</div>
-            <div class="article-text">Мы работаем под заказ из Европы и Азии.
+            <div id="article-view" class="article-view hidden">
+                <div class="article-title">Как оформить сумку под заказ ?</div>
+                <div class="article-text">Мы работаем под заказ из Европы и Азии.
 
 1) Пришлите фото или название интересующей модели.
 
@@ -250,18 +253,21 @@
 3) Для оформления заказа достаточно внести задаток 5000₽, остаток перед отправкой СДЭКом.
 
 Доставка занимает от 10 до 21 дня до момента отправки СДЭКом.</div>
-            
-            <div class="article-btn-container">
-                <a href="https://t.me/dremalovo" class="btn-main">Связаться с нами</a>
+                
+                <div class="article-btn-container">
+                    <a href="https://t.me/dremalovo" class="btn-main">Связаться с нами</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="screen-fav" class="scroll-container hidden">
-        <div class="header" style="display:flex; justify-content:center;">
-            <div class="app-title">Избранное</div>
+    <div id="screen-fav" class="scroll-container force-scroll hidden">
+        <div class="main-padding">
+            <div class="header" style="display:flex; justify-content:center;">
+                <div class="app-title">Избранное</div>
+            </div>
+            <div class="grid" id="fav-grid"></div>
         </div>
-        <div class="grid" id="fav-grid"></div>
     </div>
 
     <div id="product-modal" class="modal">
@@ -410,9 +416,8 @@
         window.showArticle = function(btn) {
             document.querySelectorAll('.pill').forEach(el=>el.classList.remove('active'));
             btn.classList.add('active');
-            
-            document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
             document.getElementById('screen-home').classList.remove('hidden');
+            document.getElementById('screen-fav').classList.add('hidden');
 
             document.getElementById('catalog').classList.add('hidden');
             document.getElementById('article-view').classList.remove('hidden');
@@ -424,8 +429,8 @@
             b.classList.add('active'); 
             currentCategory = c; 
             
-            document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
             document.getElementById('screen-home').classList.remove('hidden');
+            document.getElementById('screen-fav').classList.add('hidden');
             
             document.getElementById('catalog').classList.remove('hidden');
             document.getElementById('article-view').classList.add('hidden');
@@ -609,8 +614,8 @@
             document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            // СКРЫВАЕМ ВСЕ ЭКРАНЫ
-            document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-fav').classList.add('hidden');
             
             if (tab === 'home') {
                 document.getElementById('screen-home').classList.remove('hidden');
