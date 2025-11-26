@@ -18,7 +18,7 @@
             --active-heart: #ff3b30;
         }
 
-        /* Хак для скролла и фуллскрина */
+        /* ГЛОБАЛЬНЫЕ НАСТРОЙКИ */
         html, body { height: 100%; overflow: hidden; }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
@@ -26,55 +26,41 @@
             color: var(--text); 
             margin: 0; 
             padding: 0; 
-            /* ИСПРАВЛЕНИЕ: ГИГАНТСКИЙ ОТСТУП СНИЗУ, ЧТОБЫ ТОВАРЫ НЕ ПРЯТАЛИСЬ */
-            padding-bottom: 200px; 
-            overflow-y: scroll; 
-            -webkit-overflow-scrolling: touch;
+            -webkit-tap-highlight-color: transparent; 
         }
         ::-webkit-scrollbar { display: none; }
 
-        /* --- ШАПКА ГЛАВНАЯ (С ОГРОМНЫМ ОТСТУПОМ 70px) --- */
+        /* --- ГЛАВНЫЙ КОНТЕЙНЕР (ЧТОБЫ СКРОЛЛ БЫЛ ВНУТРИ) --- */
+        .scroll-container {
+            height: 100%;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 100px; /* Место под таббар */
+            box-sizing: border-box;
+        }
+
+        /* --- ШАПКА --- */
         .header { 
             position: sticky; 
             top: 0; 
             z-index: 100; 
             background: rgba(28,28,30,0.98); 
             border-bottom: 0.5px solid rgba(255,255,255,0.1);
-            /* ОТСТУП СВЕРХУ */
             padding-top: calc(60px + env(safe-area-inset-top)); 
             padding-bottom: 10px;
         }
 
-        /* ЛОГО И НАЗВАНИЕ */
         .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            position: relative;
-            height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 15px; position: relative; height: 32px;
         }
 
         .brand-logo {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            position: absolute;
-            left: 15px;
-            background: #333;
+            width: 32px; height: 32px; border-radius: 50%;
+            object-fit: cover; position: absolute; left: 15px; background: #333;
         }
 
-        .app-title { 
-            font-weight: 700; 
-            font-size: 22px; /* Чуть крупнее */
-            letter-spacing: -0.5px; 
-            color: #fff;
-            display: flex;
-            align-items: baseline; /* ВЫРАВНИВАНИЕ ПО НИЗУ */
-            justify-content: center;
-        }
-        /* ИСПРАВЛЕНИЕ: Точка теперь внизу */
+        .app-title { font-weight: 700; font-size: 22px; letter-spacing: -0.5px; color: #fff; display: flex; align-items: baseline; justify-content: center; }
         .dot-accent { color: var(--text); font-size: 22px; }
 
         /* ФИЛЬТРЫ */
@@ -88,8 +74,8 @@
         .sort-icon { font-size: 18px; color: var(--text); pointer-events: none; font-weight: 300; }
         .sort-select { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 10; cursor: pointer; }
 
-        /* --- СЕТКА ТОВАРОВ --- */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 15px 10px; align-items: start; }
+        /* --- СЕТКА --- */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 15px 10px; align-items: start; padding-bottom: 120px; /* ВАЖНО: ОТСТУП СНИЗУ ЧТОБЫ НЕ ПЕРЕКРЫВАЛО */ }
         .card { display: flex; flex-direction: column; position: relative; width: 100%; }
         
         .card-slider { width: 100%; aspect-ratio: 1 / 1; border-radius: 16px; overflow-x: auto; overflow-y: hidden; display: flex; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; background: var(--card-bg); position: relative;}
@@ -112,31 +98,35 @@
         .badge-new { position: absolute; top: 8px; left: 8px; background: #30d158; color: #000; font-size: 10px; font-weight: 800; padding: 4px 6px; border-radius: 6px; z-index: 10; pointer-events: none; }
 
         /* --- СТАТЬЯ --- */
-        .article-view { padding: 20px; display: none; animation: fadeIn 0.3s; }
+        .article-view { padding: 20px; display: none; animation: fadeIn 0.3s; padding-bottom: 120px;}
         .article-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; line-height: 1.3; }
         .article-text { font-size: 16px; line-height: 1.6; color: #d1d1d6; white-space: pre-wrap; }
         .article-btn-container { margin-top: 30px; }
 
-        /* --- MODAL (ТОВАР) --- */
+        /* --- MODAL (ТОВАР) - ИСПРАВЛЕННАЯ СТРУКТУРА --- */
         .modal { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: var(--bg); 
-            z-index: 100; 
-            transform: translateX(100%); 
-            transition: transform 0.25s cubic-bezier(0.1, 0.7, 0.1, 1); 
-            display: flex; 
-            flex-direction: column;
-            
-            /* ИСПРАВЛЕНИЕ: ТАКОЙ ЖЕ ОТСТУП 70px+ КАК НА ГЛАВНОЙ */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--bg); z-index: 100; 
+            transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.1, 0.7, 0.1, 1); 
+            display: flex; flex-direction: column; /* Flexbox для фиксации кнопки */
+            /* ОТСТУП СВЕРХУ ПОД ШАПКУ */
             padding-top: calc(60px + env(safe-area-inset-top));
         }
         .modal.open { transform: translateX(0); }
         
-        .gallery-container { position: relative; width: 100%; padding-top: 100%; background: #000; overflow: hidden; border-radius: 24px; margin-top: 0; }
+        /* Контент модалки скроллится */
+        .modal-scroll-area {
+            flex: 1; /* Занимает все свободное место */
+            overflow-y: auto;
+            padding: 0 20px 20px 20px;
+        }
+
+        /* Галерея с отступом */
+        .gallery-container { 
+            position: relative; width: 100%; padding-top: 100%; 
+            background: #000; overflow: hidden; border-radius: 24px; 
+            margin-top: 20px; /* ОПУСТИЛ ФОТКИ НИЖЕ */
+        }
         .gallery-track { position: absolute; top: 0; left: 0; height: 100%; display: flex; transition: transform 0.3s ease-out; }
         .gallery-item { min-width: 100%; width: 100%; height: 100%; position: relative; }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
@@ -147,39 +137,30 @@
 
         .modal-fav-pos { position: absolute; top: 15px; right: 15px; width: 28px; height: 28px; z-index: 20; }
 
-        .modal-content { flex: 1; padding: 16px 20px; overflow-y: auto; }
-        .m-header { margin-bottom: 15px; margin-top: 5px; }
+        .m-header { margin-bottom: 15px; margin-top: 15px; }
         .m-price { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: -0.5px;}
-        .m-name { font-size: 18px; font-weight: 400; line-height: 1.4; color: #d1d1d6; }
+        .m-name { font-size: 18px; font-weight: 600; line-height: 1.4; color: #d1d1d6; }
         .separator { height: 1px; background: rgba(255,255,255,0.1); width: 100%; margin: 15px 0; }
-        .m-desc { color: #fff; font-size: 15px; line-height: 1.6; white-space: pre-wrap; opacity: 0.9; }
+        .m-desc { color: #fff; font-size: 15px; line-height: 1.6; white-space: pre-wrap; opacity: 0.9; padding-bottom: 20px; }
 
-        .modal-actions { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.05); background: var(--bg); padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+        /* КНОПКА ФИКСИРОВАННАЯ ВНИЗУ */
+        .modal-actions { 
+            flex-shrink: 0; /* Не сжиматься */
+            padding: 15px 16px; 
+            border-top: 1px solid rgba(255,255,255,0.05); 
+            background: var(--bg); 
+            padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
+            z-index: 101;
+        }
         .btn-main { display: flex; width: 100%; background: var(--link); color: white; height: 50px; border-radius: 14px; align-items: center; justify-content: center; font-weight: 600; text-decoration: none; font-size: 16px; }
 
-        /* --- LIGHTBOX (ЗУМ) --- */
+        /* --- LIGHTBOX --- */
         .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 200; display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s; }
         .lightbox.show { display: flex; opacity: 1; }
         .lb-track { display: flex; height: 100%; transition: transform 0.3s ease-out; }
         .lb-item { min-width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; }
         .lb-item img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        /* ИСПРАВЛЕНИЕ: КРЕСТИК НИЖЕ, ЧТОБЫ НЕ ПЕРЕКРЫВАЛСЯ */
-        .close-zoom { 
-            position: absolute; 
-            top: 60px; /* Опустил ниже */
-            right: 20px; 
-            width: 44px; /* Сделал побольше */
-            height: 44px; 
-            background: rgba(50,50,50,0.8); 
-            border-radius: 50%; 
-            color: white; 
-            font-size: 28px; 
-            display: flex; align-items: center; justify-content: center; 
-            z-index: 210; 
-            cursor: pointer; 
-            font-weight: 300; 
-        }
+        .close-zoom { position: absolute; top: 60px; right: 20px; width: 44px; height: 44px; background: rgba(50,50,50,0.8); border-radius: 50%; color: white; font-size: 28px; display: flex; align-items: center; justify-content: center; z-index: 210; cursor: pointer; font-weight: 300; }
         .lb-counter { position: absolute; top: 70px; left: 20px; color: white; font-weight: 600; font-size: 16px; z-index: 210;}
 
         /* --- TAB BAR --- */
@@ -192,24 +173,7 @@
         .hidden { display: none !important; }
 
         /* --- TOAST --- */
-        .toast { 
-            position: fixed; 
-            bottom: 40px; 
-            left: 50%; 
-            transform: translateX(-50%) translateY(20px); 
-            background: #ffffff; 
-            color: #000; 
-            padding: 10px 20px; 
-            border-radius: 12px; 
-            font-size: 14px; 
-            font-weight: 600; 
-            opacity: 0; 
-            transition: 0.3s; 
-            pointer-events: none; 
-            z-index: 150; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            white-space: nowrap;
-        }
+        .toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(20px); background: #ffffff; color: #000; padding: 10px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 150; box-shadow: 0 4px 15px rgba(0,0,0,0.4); white-space: nowrap; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
@@ -223,7 +187,7 @@
         <div class="lb-track" id="lb-track"></div>
     </div>
 
-    <div id="screen-home">
+    <div id="screen-home" class="scroll-container">
         <div class="header">
             <div class="top-bar">
                 <img id="brand-logo" class="brand-logo" src="" style="display:none">
@@ -255,7 +219,6 @@
         </div>
 
         <div id="article-view" class="article-view hidden">
-            <div style="height: 60px;"></div>
             <div class="article-title">Как оформить сумку под заказ ?</div>
             <div class="article-text">Мы работаем под заказ из Европы и Азии.
 
@@ -273,15 +236,15 @@
         </div>
     </div>
 
-    <div id="screen-fav" class="hidden">
-        <div class="header" style="display:flex; justify-content:center;">
+    <div id="screen-fav" class="scroll-container hidden">
+        <div class="header">
             <div class="app-title">Избранное</div>
         </div>
         <div class="grid" id="fav-grid"></div>
     </div>
 
     <div id="product-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-scroll-area">
             <div class="gallery-container">
                 <div class="gallery-track" id="gallery-track"></div>
                 <div class="modal-dots" id="modal-dots"></div>
@@ -451,8 +414,10 @@
             document.getElementById('m-price').innerText = p.price + ' ₽';
             document.getElementById('m-desc').innerText = p.description || '';
             
+            // ИСПРАВЛЕНИЕ ССЫЛКИ
             const firstImg = p.images ? p.images.split(',')[0].trim() : '';
-            document.getElementById('m-buy-btn').href = `https://t.me/${myNick}?text=Привет! Хочу купить ${p.name} (${firstImg})`;
+            const text = `Привет! Хочу купить ${p.name} (${firstImg})`;
+            document.getElementById('m-buy-btn').href = `https://t.me/${myNick}?text=${encodeURIComponent(text)}`;
             
             updateModalFavIcon();
             renderModalGallery();
@@ -615,10 +580,16 @@
         function switchTab(tab, btn) {
             document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            document.getElementById('screen-home').classList.add('hidden');
-            document.getElementById('screen-fav').classList.add('hidden');
-            if (tab === 'home') document.getElementById('screen-home').classList.remove('hidden');
-            else { document.getElementById('screen-fav').classList.remove('hidden'); renderFavs(); }
+            
+            // СКРЫВАЕМ ВСЕ ЭКРАНЫ
+            document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
+            
+            if (tab === 'home') {
+                document.getElementById('screen-home').classList.remove('hidden');
+            } else {
+                document.getElementById('screen-fav').classList.remove('hidden');
+                renderFavs();
+            }
         }
 
         window.applySort = (t) => { currentSort = t; renderCatalog(); }
