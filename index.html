@@ -18,7 +18,7 @@
             --active-heart: #ff3b30;
         }
 
-        /* ГЛОБАЛЬНЫЙ БЛОК СВАЙПА */
+        /* ГЛОБАЛЬНЫЕ НАСТРОЙКИ */
         html, body { 
             height: 100%; 
             overflow: hidden; 
@@ -27,24 +27,32 @@
             margin: 0; 
             padding: 0; 
             -webkit-tap-highlight-color: transparent;
-            /* ШРИФТЫ ИЗ 30-й ВЕРСИИ (СИСТЕМНЫЕ) */
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; 
+            /* ЖЕСТКИЙ ШРИФТ: ЧТОБЫ У ВСЕХ БЫЛО КРАСИВО */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
         }
         
         ::-webkit-scrollbar { display: none; }
 
-        /* --- УНИВЕРСАЛЬНЫЙ КОНТЕЙНЕР С ХАКОМ (ДЛЯ ГЛАВНОЙ) --- */
+        /* --- УНИВЕРСАЛЬНЫЙ КОНТЕЙНЕР СКРОЛЛА --- */
         .scroll-container {
             height: 100%;
-            overflow-y: scroll; 
+            overflow-y: scroll; /* ВСЕГДА ВКЛЮЧЕН СКРОЛЛ */
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 120px; /* Место под меню */
+            padding-bottom: 120px; /* Место под таббар */
             box-sizing: border-box;
-            position: absolute; top: 0; left: 0; width: 100%;
+            position: absolute;
+            top: 0; left: 0; width: 100%;
         }
-        /* Хак: Растягиваем контент на 101% высоты */
+
+        /* ГЛАВНЫЙ ХАК: ДЕЛАЕМ КОНТЕНТ ВСЕГДА БОЛЬШЕ ЭКРАНА НА 1px */
         .scroll-container::after {
-            content: ""; display: block; height: 1px; width: 100%; min-height: calc(100% + 1px);
+            content: "";
+            display: block;
+            height: 101%; /* Растягиваем контент, чтобы появился скролл */
+            width: 1px;
+            position: absolute;
+            top: 0;
+            z-index: -1;
         }
 
         /* --- ШАПКА --- */
@@ -75,7 +83,7 @@
         .filters-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 15px; align-items: center; scrollbar-width: none; }
         .filters-row::-webkit-scrollbar { display: none; }
         
-        .pill { background: var(--card-bg); color: var(--text); border: none; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
+        .pill { background: var(--card-bg); color: var(--text); border: none; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
         .pill.active { background: var(--text); color: var(--bg); }
         
         .sort-wrapper { position: relative; width: 44px; height: 36px; background: var(--card-bg); border-radius: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: -2px; }
@@ -83,7 +91,7 @@
         .sort-select { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 10; cursor: pointer; }
 
         /* --- СЕТКА --- */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 15px 10px; align-items: start; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 15px 10px; align-items: start; position: relative; z-index: 2; }
         .card { display: flex; flex-direction: column; position: relative; width: 100%; }
         
         .card-slider { width: 100%; aspect-ratio: 1 / 1; border-radius: 16px; overflow-x: auto; overflow-y: hidden; display: flex; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; background: var(--card-bg); position: relative;}
@@ -106,7 +114,7 @@
         .badge-new { position: absolute; top: 8px; left: 8px; background: #30d158; color: #000; font-size: 10px; font-weight: 800; padding: 4px 6px; border-radius: 6px; z-index: 10; pointer-events: none; }
 
         /* --- СТАТЬЯ --- */
-        .article-view { padding: 20px; display: none; animation: fadeIn 0.3s; padding-bottom: 150px; position: relative; z-index: 2;}
+        .article-view { padding: 20px; display: none; animation: fadeIn 0.3s; position: relative; z-index: 2; }
         .article-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; line-height: 1.3; }
         .article-text { font-size: 16px; line-height: 1.6; color: #d1d1d6; white-space: pre-wrap; }
         .article-btn-container { margin-top: 30px; }
@@ -120,27 +128,22 @@
         }
         .modal.open { transform: translateX(0); }
         
-        /* ВОТ ОН: ТОТ ЖЕ ХАК, ЧТО И НА ГЛАВНОЙ, НО ВНУТРИ ТОВАРА
-           Это заставит модалку скроллиться, а не закрываться
-        */
+        /* ВНУТРЕННИЙ СКРОЛЛ ТОВАРА ТОЖЕ С ХАКОМ */
         .modal-scroll-area {
             flex: 1; 
             overflow-y: scroll; 
             -webkit-overflow-scrolling: touch;
-            
-            /* Отступ сверху (чтобы не лезло под шапку) */
-            padding-top: calc(60px + env(safe-area-inset-top));
+            padding-top: calc(120px + env(safe-area-inset-top));
             padding-left: 20px; padding-right: 20px; padding-bottom: 20px;
         }
-        /* РАСПОРКА ВНУТРИ ТОВАРА */
+        /* Хак для модалки: контент длиннее экрана */
         .modal-scroll-area::after {
-            content: ""; display: block; height: 1px; min-height: calc(100% + 1px); width: 100%;
+            content: ""; display: block; height: 101%; width: 1px; position: absolute; top: 0; z-index: -1;
         }
 
         .gallery-container { 
             position: relative; width: 100%; padding-top: 100%; 
-            background: #000; overflow: hidden; border-radius: 24px; 
-            margin-top: 0; 
+            background: #000; overflow: hidden; border-radius: 24px; margin-top: 0; 
         }
         .gallery-track { position: absolute; top: 0; left: 0; height: 100%; display: flex; transition: transform 0.3s ease-out; }
         .gallery-item { min-width: 100%; width: 100%; height: 100%; position: relative; }
@@ -158,7 +161,6 @@
         .separator { height: 1px; background: rgba(255,255,255,0.1); width: 100%; margin: 15px 0; }
         .m-desc { color: #fff; font-size: 15px; line-height: 1.6; white-space: pre-wrap; opacity: 0.9; padding-bottom: 20px; }
 
-        /* КНОПКА ФИКСИРОВАНА */
         .modal-actions { 
             flex-shrink: 0; padding: 15px 16px; 
             border-top: 1px solid rgba(255,255,255,0.05); 
@@ -168,14 +170,12 @@
         }
         .btn-main { display: flex; width: 100%; background: var(--link); color: white; height: 50px; border-radius: 14px; align-items: center; justify-content: center; font-weight: 600; text-decoration: none; font-size: 16px; }
 
-        /* --- LIGHTBOX (ЗУМ) - КРЕСТИК НИЖЕ --- */
+        /* --- LIGHTBOX --- */
         .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 200; display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s; }
         .lightbox.show { display: flex; opacity: 1; }
         .lb-track { display: flex; height: 100%; transition: transform 0.3s ease-out; }
         .lb-item { min-width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; }
         .lb-item img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        /* ОПУСТИЛ КРЕСТИК НА 140px */
         .close-zoom { position: absolute; top: 140px; right: 20px; width: 44px; height: 44px; background: rgba(50,50,50,0.8); border-radius: 50%; color: white; font-size: 28px; display: flex; align-items: center; justify-content: center; z-index: 210; cursor: pointer; font-weight: 300; }
         .lb-counter { position: absolute; top: 150px; left: 20px; color: white; font-weight: 600; font-size: 16px; z-index: 210;}
 
@@ -253,7 +253,7 @@
     </div>
 
     <div id="screen-fav" class="scroll-container hidden">
-        <div class="header" style="display:flex; justify-content:center;">
+        <div class="header">
             <div class="app-title">Избранное</div>
         </div>
         <div class="grid" id="fav-grid"></div>
@@ -304,8 +304,6 @@
         tg.ready();
         tg.expand();
         try { tg.requestFullscreen(); } catch (e) {}
-        
-        // ЗАЩИТА ОТ СВАЙПА
         tg.enableClosingConfirmation(); 
 
         tg.setHeaderColor('#1c1c1e'); 
@@ -407,10 +405,11 @@
         window.showArticle = function(btn) {
             document.querySelectorAll('.pill').forEach(el=>el.classList.remove('active'));
             btn.classList.add('active');
-            
+            // Прячем все контейнеры
             document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
+            // Показываем главный, чтобы шапка осталась
             document.getElementById('screen-home').classList.remove('hidden');
-
+            
             document.getElementById('catalog').classList.add('hidden');
             document.getElementById('article-view').classList.remove('hidden');
             document.getElementById('article-view').style.display = 'block';
@@ -606,7 +605,7 @@
             document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            // СКРЫВАЕМ ВСЕ ЭКРАНЫ
+            // Прячем все контейнеры
             document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
             
             if (tab === 'home') {
