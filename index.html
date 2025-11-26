@@ -26,8 +26,7 @@
             margin: 0; 
             padding: 0; 
             -webkit-tap-highlight-color: transparent;
-            /* ЖЕСТКИЙ ШРИФТ: ЧТОБЫ У ВСЕХ БЫЛО КРАСИВО */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; 
         }
         
         ::-webkit-scrollbar { display: none; }
@@ -35,23 +34,17 @@
         /* --- УНИВЕРСАЛЬНЫЙ КОНТЕЙНЕР СКРОЛЛА --- */
         .scroll-container {
             height: 100%;
-            overflow-y: scroll; /* ВСЕГДА ВКЛЮЧЕН СКРОЛЛ */
+            overflow-y: scroll; 
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 120px; /* Место под таббар */
+            padding-bottom: 120px; 
             box-sizing: border-box;
             position: absolute;
             top: 0; left: 0; width: 100%;
         }
 
-        /* ГЛАВНЫЙ ХАК: ДЕЛАЕМ КОНТЕНТ ВСЕГДА БОЛЬШЕ ЭКРАНА НА 1px */
+        /* ГЛАВНЫЙ ХАК */
         .scroll-container::after {
-            content: "";
-            display: block;
-            height: 101%; /* Растягиваем контент, чтобы появился скролл */
-            width: 1px;
-            position: absolute;
-            top: 0;
-            z-index: -1;
+            content: ""; display: block; height: 1px; width: 100%; min-height: calc(100% + 1px); position: absolute; top: 0; z-index: -1;
         }
 
         /* --- ШАПКА --- */
@@ -82,7 +75,7 @@
         .filters-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 15px; align-items: center; scrollbar-width: none; }
         .filters-row::-webkit-scrollbar { display: none; }
         
-        .pill { background: var(--card-bg); color: var(--text); border: none; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
+        .pill { background: var(--card-bg); color: var(--text); border: none; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
         .pill.active { background: var(--text); color: var(--bg); }
         
         .sort-wrapper { position: relative; width: 44px; height: 36px; background: var(--card-bg); border-radius: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: -2px; }
@@ -127,22 +120,23 @@
         }
         .modal.open { transform: translateX(0); }
         
-        /* ВНУТРЕННИЙ СКРОЛЛ ТОВАРА ТОЖЕ С ХАКОМ */
+        /* ВНУТРЕННИЙ СКРОЛЛ ТОВАРА */
         .modal-scroll-area {
             flex: 1; 
-            overflow-y: scroll; 
+            overflow-y: auto; 
             -webkit-overflow-scrolling: touch;
             padding-top: calc(120px + env(safe-area-inset-top));
             padding-left: 20px; padding-right: 20px; padding-bottom: 20px;
         }
-        /* Хак для модалки: контент длиннее экрана */
+        /* ХАК ДЛЯ ТОВАРА */
         .modal-scroll-area::after {
-            content: ""; display: block; height: 101%; width: 1px; position: absolute; top: 0; z-index: -1;
+            content: ""; display: block; height: 1px; width: 100%; min-height: calc(100% + 1px);
         }
 
         .gallery-container { 
             position: relative; width: 100%; padding-top: 100%; 
-            background: #000; overflow: hidden; border-radius: 24px; margin-top: 0; 
+            background: #000; overflow: hidden; border-radius: 24px; 
+            margin-top: 0; 
         }
         .gallery-track { position: absolute; top: 0; left: 0; height: 100%; display: flex; transition: transform 0.3s ease-out; }
         .gallery-item { min-width: 100%; width: 100%; height: 100%; position: relative; }
@@ -167,7 +161,15 @@
             padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
             z-index: 101;
         }
-        .btn-main { display: flex; width: 100%; background: var(--link); color: white; height: 50px; border-radius: 14px; align-items: center; justify-content: center; font-weight: 600; text-decoration: none; font-size: 16px; }
+        
+        .btn-main { 
+            display: flex; width: 100%; 
+            background: var(--link); color: white; 
+            height: 50px; border-radius: 14px; 
+            align-items: center; justify-content: center; 
+            font-weight: 600; text-decoration: none; font-size: 16px; 
+            cursor: pointer; 
+        }
 
         /* --- LIGHTBOX --- */
         .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 200; display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s; }
@@ -279,7 +281,7 @@
         </div>
         
         <div class="modal-actions">
-           <div id="m-buy-btn" class="btn-main">Написать продавцу</div>
+            <div class="btn-main" id="m-buy-btn">Написать продавцу</div>
         </div>
     </div>
 
@@ -303,12 +305,14 @@
         tg.ready();
         tg.expand();
         try { tg.requestFullscreen(); } catch (e) {}
+        
+        // ВКЛЮЧАЕМ ЗАЩИТУ ОТ ЗАКРЫТИЯ
         tg.enableClosingConfirmation(); 
 
         tg.setHeaderColor('#1c1c1e'); 
         tg.setBackgroundColor('#1c1c1e');
 
-        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlz9ch-Zo9aFoJmlDbwpnHsIbUusWYja-1onKKlWEWifL21ApHup5nRz9QizS68fKTaJWHHIZOurOW/pub?gid=0&single=true&output=csv';
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSCUjfhUF-VGSduNwo7Jscp9Vfkv36T-nW7id5aAUaiYTcjQg9I1Q0_DfDc3SE0wjJDrVZNN4SMBno/pub?gid=0&single=true&output=csv';
         const myNick = 'regsto'; 
         
         const logoUrl = ""; 
@@ -377,15 +381,11 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    ${(currentSort==='new' && index<3) ? '<div class="badge-new">NEW</div>' : ''}
-                    <div class="card-slider" onscroll="updateCardDots(this)">${slidesHtml}</div>
-                    
+                    <div class="card-slider"><img src="${img}" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:14px" onclick="openProduct('${p.id}')"></div>
                     <svg class="fav-icon-svg ${isFav?'liked':''}" viewBox="0 0 24 24" onclick="toggleFavFromCard(this, '${p.id}')">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
-
-                    ${dotsHtml}
-                    
+                    <div class="dots-row"></div>
                     <div class="card-info" onclick="openProduct('${p.id}')">
                         <div class="price">${p.price} ₽</div>
                         <div class="name">${p.name}</div>
@@ -404,11 +404,10 @@
         window.showArticle = function(btn) {
             document.querySelectorAll('.pill').forEach(el=>el.classList.remove('active'));
             btn.classList.add('active');
-            // Прячем все контейнеры
-            document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
-            // Показываем главный, чтобы шапка осталась
-            document.getElementById('screen-home').classList.remove('hidden');
             
+            document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
+            document.getElementById('screen-home').classList.remove('hidden');
+
             document.getElementById('catalog').classList.add('hidden');
             document.getElementById('article-view').classList.remove('hidden');
             document.getElementById('article-view').style.display = 'block';
@@ -440,9 +439,16 @@
             
             const firstImg = p.images ? p.images.split(',')[0].trim() : '';
             const text = `Привет! Хочу купить ${p.name} (${firstImg})`;
-            document.getElementById('m-buy-btn').onclick = function() {
-    tg.openTelegramLink(`https://t.me/${myNick}?text=${encodeURIComponent(text)}`);
-};
+            
+            // ИСПРАВЛЕННАЯ ЛОГИКА КНОПКИ (БЕЗ ОШИБОК)
+            const btn = document.getElementById('m-buy-btn');
+            // Клонируем чтобы убрать старые слушатели
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.onclick = function() {
+                tg.openTelegramLink(`https://t.me/${myNick}?text=${encodeURIComponent(text)}`);
+            };
             
             updateModalFavIcon();
             renderModalGallery();
@@ -606,7 +612,7 @@
             document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            // Прячем все контейнеры
+            // СКРЫВАЕМ ВСЕ ЭКРАНЫ
             document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
             
             if (tab === 'home') {
