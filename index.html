@@ -18,44 +18,26 @@
             --active-heart: #ff3b30;
         }
 
-        /* ГЛОБАЛЬНЫЕ НАСТРОЙКИ: БЛОКИРУЕМ ЗАКРЫТИЕ НА УРОВНЕ HTML */
-        html { height: 100%; overflow: hidden; }
-        
+        /* --- БАЗА ИЗ V30 (ИДЕАЛЬНАЯ) --- */
+        html { height: 100%; }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; 
             background-color: var(--bg); 
             color: var(--text); 
             margin: 0; 
             padding: 0; 
-            height: 100%;
-            overflow: hidden; 
+            padding-bottom: 100px; 
             -webkit-tap-highlight-color: transparent; 
+            
+            /* ГЛАВНАЯ СТРАНИЦА СКРОЛЛИТСЯ ЕСТЕСТВЕННО (КАК В V30) */
+            overflow-y: scroll; 
+            -webkit-overflow-scrolling: touch;
+            height: 100%;
         }
         
         ::-webkit-scrollbar { display: none; }
 
-        /* --- УНИВЕРСАЛЬНЫЙ СКРОЛЛ-КОНТЕЙНЕР (РАБОТАЕТ ВЕЗДЕ) --- */
-        .scroll-container {
-            height: 100%;
-            overflow-y: scroll; /* Принудительный скролл */
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior-y: contain; /* Скролл остается внутри */
-            position: relative;
-        }
-
-        /* ХАК: ДЕЛАЕМ КОНТЕНТ ВСЕГДА ДЛИННЕЕ ЭКРАНА НА 1px */
-        /* Это заставляет Телеграм думать, что страницу можно листать, и отключает закрытие */
-        .force-scroll::after {
-            content: "";
-            display: block;
-            height: 2px; /* Распорка */
-            width: 100%;
-        }
-
-        /* ОТСТУП СНИЗУ ДЛЯ ГЛАВНОЙ */
-        .main-padding { padding-bottom: 150px; }
-
-        /* --- ШАПКА --- */
+        /* --- ШАПКА (V30) --- */
         .header { 
             position: sticky; 
             top: 0; 
@@ -79,7 +61,6 @@
         .app-title { font-weight: 700; font-size: 22px; letter-spacing: -0.5px; color: #fff; display: flex; align-items: baseline; justify-content: center; }
         .dot-accent { color: var(--text); font-size: 22px; }
 
-        /* ФИЛЬТРЫ */
         .filters-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 15px; align-items: center; scrollbar-width: none; }
         .filters-row::-webkit-scrollbar { display: none; }
         
@@ -90,7 +71,7 @@
         .sort-icon { font-size: 18px; color: var(--text); pointer-events: none; font-weight: 300; }
         .sort-select { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 10; cursor: pointer; }
 
-        /* --- СЕТКА --- */
+        /* --- СЕТКА (V30) --- */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 15px 10px; align-items: start; }
         .card { display: flex; flex-direction: column; position: relative; width: 100%; }
         
@@ -114,12 +95,12 @@
         .badge-new { position: absolute; top: 8px; left: 8px; background: #30d158; color: #000; font-size: 10px; font-weight: 800; padding: 4px 6px; border-radius: 6px; z-index: 10; pointer-events: none; }
 
         /* --- СТАТЬЯ --- */
-        .article-view { padding: 20px; display: none; animation: fadeIn 0.3s; }
+        .article-view { padding: 20px; display: none; animation: fadeIn 0.3s; padding-bottom: 150px; }
         .article-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; line-height: 1.3; }
         .article-text { font-size: 16px; line-height: 1.6; color: #d1d1d6; white-space: pre-wrap; }
         .article-btn-container { margin-top: 30px; }
 
-        /* --- MODAL (ТОВАР) --- */
+        /* --- MODAL (ТОВАР) - ВОТ ТУТ ХАК --- */
         .modal { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--bg); z-index: 100; 
@@ -128,29 +109,36 @@
         }
         .modal.open { transform: translateX(0); }
         
-        /* ЗОНА СКРОЛЛА ВНУТРИ ТОВАРА */
+        /* ВНУТРЕННИЙ СКРОЛЛ ТОВАРА */
         .modal-scroll-area {
             flex: 1; 
-            overflow-y: scroll; 
+            overflow-y: auto; /* Скролл здесь */
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior-y: contain; /* ВАЖНО */
+            /* ЭТА СТРОКА ЗАПРЕЩАЕТ ПЕРЕДАВАТЬ СКРОЛЛ НАВЕРХ (ЧТОБЫ НЕ ЗАКРЫЛОСЬ) */
+            overscroll-behavior-y: contain; 
             
-            padding-top: calc(120px + env(safe-area-inset-top)); /* Большой отступ */
+            /* Отступы внутри товара */
+            padding-top: calc(120px + env(safe-area-inset-top));
             padding-left: 20px; padding-right: 20px; padding-bottom: 20px;
         }
         
-        /* ХАК ДЛЯ ТОВАРА: РАСПОРКА, ЧТОБЫ БЫЛ СКРОЛЛ */
+        /* !!! ГЛАВНЫЙ ХАК !!! 
+           Мы делаем контент внутри модалки всегда чуть длиннее экрана (на 1px).
+           Поэтому телефон всегда думает, что страницу можно скроллить, 
+           и не пытается её закрыть свайпом. 
+        */
         .modal-scroll-area::after {
             content: "";
             display: block;
-            height: 2px; /* Микро-высота, чтобы контент был больше экрана */
+            height: 1px; 
             width: 100%;
+            min-height: calc(100% + 1px);
         }
 
+        /* Контент товара */
         .gallery-container { 
             position: relative; width: 100%; padding-top: 100%; 
-            background: #000; overflow: hidden; border-radius: 24px; 
-            margin-top: 0; 
+            background: #000; overflow: hidden; border-radius: 24px; margin-top: 0; 
         }
         .gallery-track { position: absolute; top: 0; left: 0; height: 100%; display: flex; transition: transform 0.3s ease-out; }
         .gallery-item { min-width: 100%; width: 100%; height: 100%; position: relative; }
@@ -210,41 +198,40 @@
         <div class="lb-track" id="lb-track"></div>
     </div>
 
-    <div id="screen-home" class="scroll-container force-scroll">
-        <div class="main-padding">
-            <div class="header">
-                <div class="top-bar">
-                    <img id="brand-logo" class="brand-logo" src="" style="display:none">
-                    <div class="app-title">Cigautrom<span class="dot-accent">.</span></div>
-                </div>
-
-                <div class="filters-row">
-                    <div class="sort-wrapper">
-                        <div class="sort-icon">⇅</div>
-                        <select class="sort-select" onchange="applySort(this.value)">
-                            <option value="new">Сначала новые</option>
-                            <option value="asc">Сначала дешевые</option>
-                            <option value="desc">Сначала дорогие</option>
-                            <option value="avito">С Авитодоставкой</option>
-                        </select>
-                    </div>
-                    <button class="pill active" onclick="setCategory('all', this)">Все</button>
-                    <button class="pill" onclick="setCategory('bags', this)">Сумки</button>
-                    <button class="pill" onclick="showArticle(this)">Под заказ</button>
-                    <button class="pill" onclick="setCategory('jackets', this)">Куртки</button>
-                    <button class="pill" onclick="setCategory('tshirts', this)">Кофты / Футболки</button>
-                    <button class="pill" onclick="setCategory('accessories', this)">Аксессуары</button>
-                    <button class="pill" onclick="setCategory('shoes', this)">Обувь</button>
-                </div>
+    <div id="screen-home">
+        <div class="header">
+            <div class="top-bar">
+                <img id="brand-logo" class="brand-logo" src="" style="display:none">
+                <div class="app-title">Cigautrom<span class="dot-accent">.</span></div>
             </div>
 
-            <div class="grid" id="catalog">
-                <div style="grid-column: span 2; text-align: center; padding: 40px; color: var(--hint);">Загрузка...</div>
+            <div class="filters-row">
+                <div class="sort-wrapper">
+                    <div class="sort-icon">⇅</div>
+                    <select class="sort-select" onchange="applySort(this.value)">
+                        <option value="new">Сначала новые</option>
+                        <option value="asc">Сначала дешевые</option>
+                        <option value="desc">Сначала дорогие</option>
+                        <option value="avito">С Авитодоставкой</option>
+                    </select>
+                </div>
+                <button class="pill active" onclick="setCategory('all', this)">Все</button>
+                <button class="pill" onclick="setCategory('bags', this)">Сумки</button>
+                <button class="pill" onclick="showArticle(this)">Под заказ</button>
+                <button class="pill" onclick="setCategory('jackets', this)">Куртки</button>
+                <button class="pill" onclick="setCategory('tshirts', this)">Кофты / Футболки</button>
+                <button class="pill" onclick="setCategory('accessories', this)">Аксессуары</button>
+                <button class="pill" onclick="setCategory('shoes', this)">Обувь</button>
             </div>
+        </div>
 
-            <div id="article-view" class="article-view hidden">
-                <div class="article-title">Как оформить сумку под заказ ?</div>
-                <div class="article-text">Мы работаем под заказ из Европы и Азии.
+        <div class="grid" id="catalog">
+            <div style="grid-column: span 2; text-align: center; padding: 40px; color: var(--hint);">Загрузка...</div>
+        </div>
+
+        <div id="article-view" class="article-view hidden">
+            <div class="article-title">Как оформить сумку под заказ ?</div>
+            <div class="article-text">Мы работаем под заказ из Европы и Азии.
 
 1) Пришлите фото или название интересующей модели.
 
@@ -253,21 +240,18 @@
 3) Для оформления заказа достаточно внести задаток 5000₽, остаток перед отправкой СДЭКом.
 
 Доставка занимает от 10 до 21 дня до момента отправки СДЭКом.</div>
-                
-                <div class="article-btn-container">
-                    <a href="https://t.me/dremalovo" class="btn-main">Связаться с нами</a>
-                </div>
+            
+            <div class="article-btn-container">
+                <a href="https://t.me/dremalovo" class="btn-main">Связаться с нами</a>
             </div>
         </div>
     </div>
 
-    <div id="screen-fav" class="scroll-container force-scroll hidden">
-        <div class="main-padding">
-            <div class="header" style="display:flex; justify-content:center;">
-                <div class="app-title">Избранное</div>
-            </div>
-            <div class="grid" id="fav-grid"></div>
+    <div id="screen-fav" class="hidden">
+        <div class="header" style="display:flex; justify-content:center;">
+            <div class="app-title">Избранное</div>
         </div>
+        <div class="grid" id="fav-grid"></div>
     </div>
 
     <div id="product-modal" class="modal">
@@ -416,9 +400,6 @@
         window.showArticle = function(btn) {
             document.querySelectorAll('.pill').forEach(el=>el.classList.remove('active'));
             btn.classList.add('active');
-            document.getElementById('screen-home').classList.remove('hidden');
-            document.getElementById('screen-fav').classList.add('hidden');
-
             document.getElementById('catalog').classList.add('hidden');
             document.getElementById('article-view').classList.remove('hidden');
             document.getElementById('article-view').style.display = 'block';
@@ -428,10 +409,6 @@
             document.querySelectorAll('.pill').forEach(el=>el.classList.remove('active')); 
             b.classList.add('active'); 
             currentCategory = c; 
-            
-            document.getElementById('screen-home').classList.remove('hidden');
-            document.getElementById('screen-fav').classList.add('hidden');
-            
             document.getElementById('catalog').classList.remove('hidden');
             document.getElementById('article-view').classList.add('hidden');
             document.getElementById('article-view').style.display = 'none';
