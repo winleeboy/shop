@@ -30,7 +30,7 @@
         }
         ::-webkit-scrollbar { display: none; }
 
-        /* --- ГЛАВНЫЙ КОНТЕЙНЕР (ЧТОБЫ СКРОЛЛ БЫЛ ВНУТРИ) --- */
+        /* --- ГЛАВНЫЙ КОНТЕЙНЕР СКРОЛЛА --- */
         .scroll-container {
             height: 100%;
             overflow-y: scroll;
@@ -46,7 +46,7 @@
             z-index: 100; 
             background: rgba(28,28,30,0.98); 
             border-bottom: 0.5px solid rgba(255,255,255,0.1);
-            padding-top: calc(60px + env(safe-area-inset-top)); 
+            padding-top: calc(50px + env(safe-area-inset-top)); 
             padding-bottom: 10px;
         }
 
@@ -75,7 +75,7 @@
         .sort-select { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 10; cursor: pointer; }
 
         /* --- СЕТКА --- */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 15px 10px; align-items: start; padding-bottom: 120px; /* ВАЖНО: ОТСТУП СНИЗУ ЧТОБЫ НЕ ПЕРЕКРЫВАЛО */ }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 15px 10px; align-items: start; padding-bottom: 120px; }
         .card { display: flex; flex-direction: column; position: relative; width: 100%; }
         
         .card-slider { width: 100%; aspect-ratio: 1 / 1; border-radius: 16px; overflow-x: auto; overflow-y: hidden; display: flex; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; background: var(--card-bg); position: relative;}
@@ -103,29 +103,34 @@
         .article-text { font-size: 16px; line-height: 1.6; color: #d1d1d6; white-space: pre-wrap; }
         .article-btn-container { margin-top: 30px; }
 
-        /* --- MODAL (ТОВАР) - ИСПРАВЛЕННАЯ СТРУКТУРА --- */
+        /* --- MODAL (ТОВАР) - СТРУКТУРА FLEX ДЛЯ ФИКСАЦИИ КНОПКИ --- */
         .modal { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--bg); z-index: 100; 
             transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.1, 0.7, 0.1, 1); 
-            display: flex; flex-direction: column; /* Flexbox для фиксации кнопки */
-            /* ОТСТУП СВЕРХУ ПОД ШАПКУ */
-            padding-top: calc(60px + env(safe-area-inset-top));
+            display: flex; flex-direction: column; 
+            /* УБРАЛ padding-top ОТСЮДА, ЧТОБЫ УПРАВЛЯТЬ СКРОЛЛОМ ВНУТРИ */
         }
         .modal.open { transform: translateX(0); }
         
-        /* Контент модалки скроллится */
+        /* ЗОНА СКРОЛЛА (ВЕРХНЯЯ ЧАСТЬ) */
         .modal-scroll-area {
-            flex: 1; /* Занимает все свободное место */
+            flex: 1; /* Занимает всё место, кроме кнопки */
             overflow-y: auto;
-            padding: 0 20px 20px 20px;
+            -webkit-overflow-scrolling: touch;
+            /* ЗАЩИТА ОТ СЛУЧАЙНОГО ЗАКРЫТИЯ СВАЙПОМ */
+            overscroll-behavior: contain; 
+            /* ОТСТУП СВЕРХУ (70px+), чтобы фото не лезло под шапку */
+            padding-top: calc(60px + env(safe-area-inset-top));
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 20px;
         }
 
-        /* Галерея с отступом */
         .gallery-container { 
             position: relative; width: 100%; padding-top: 100%; 
             background: #000; overflow: hidden; border-radius: 24px; 
-            margin-top: 20px; /* ОПУСТИЛ ФОТКИ НИЖЕ */
+            margin-top: 0; 
         }
         .gallery-track { position: absolute; top: 0; left: 0; height: 100%; display: flex; transition: transform 0.3s ease-out; }
         .gallery-item { min-width: 100%; width: 100%; height: 100%; position: relative; }
@@ -141,27 +146,53 @@
         .m-price { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: -0.5px;}
         .m-name { font-size: 18px; font-weight: 600; line-height: 1.4; color: #d1d1d6; }
         .separator { height: 1px; background: rgba(255,255,255,0.1); width: 100%; margin: 15px 0; }
-        .m-desc { color: #fff; font-size: 15px; line-height: 1.6; white-space: pre-wrap; opacity: 0.9; padding-bottom: 20px; }
+        .m-desc { color: #fff; font-size: 15px; line-height: 1.6; white-space: pre-wrap; opacity: 0.9; padding-bottom: 10px; }
 
-        /* КНОПКА ФИКСИРОВАННАЯ ВНИЗУ */
+        /* КНОПКА (ФИКСИРОВАННАЯ ВНИЗУ) */
         .modal-actions { 
             flex-shrink: 0; /* Не сжиматься */
             padding: 15px 16px; 
             border-top: 1px solid rgba(255,255,255,0.05); 
             background: var(--bg); 
+            /* ОТСТУП СНИЗУ ДЛЯ АЙФОНОВ (ЧТОБЫ ЧЕРНАЯ ПОЛОСКА НЕ ПЕРЕКРЫВАЛА) */
             padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
             z-index: 101;
         }
         .btn-main { display: flex; width: 100%; background: var(--link); color: white; height: 50px; border-radius: 14px; align-items: center; justify-content: center; font-weight: 600; text-decoration: none; font-size: 16px; }
 
-        /* --- LIGHTBOX --- */
+        /* --- LIGHTBOX (ЗУМ) --- */
         .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 200; display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s; }
         .lightbox.show { display: flex; opacity: 1; }
         .lb-track { display: flex; height: 100%; transition: transform 0.3s ease-out; }
         .lb-item { min-width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; }
         .lb-item img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .close-zoom { position: absolute; top: 60px; right: 20px; width: 44px; height: 44px; background: rgba(50,50,50,0.8); border-radius: 50%; color: white; font-size: 28px; display: flex; align-items: center; justify-content: center; z-index: 210; cursor: pointer; font-weight: 300; }
-        .lb-counter { position: absolute; top: 70px; left: 20px; color: white; font-weight: 600; font-size: 16px; z-index: 210;}
+        
+        /* КРЕСТИК НИЖЕ НА 100px */
+        .close-zoom { 
+            position: absolute; 
+            top: 90px; /* БЫЛО 60, СТАЛО 90 */
+            right: 20px; 
+            width: 44px; 
+            height: 44px; 
+            background: rgba(50,50,50,0.8); 
+            border-radius: 50%; 
+            color: white; 
+            font-size: 28px; 
+            display: flex; align-items: center; justify-content: center; 
+            z-index: 210; 
+            cursor: pointer; 
+            font-weight: 300; 
+        }
+        /* СЧЕТЧИК НИЖЕ НА 100px */
+        .lb-counter { 
+            position: absolute; 
+            top: 100px; /* БЫЛО 70, СТАЛО 100 */
+            left: 20px; 
+            color: white; 
+            font-weight: 600; 
+            font-size: 16px; 
+            z-index: 210;
+        }
 
         /* --- TAB BAR --- */
         .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #1c1c1e; border-top: 0.5px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; padding-top: 10px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 80; }
@@ -398,6 +429,11 @@
             document.querySelectorAll('.pill').forEach(el=>el.classList.remove('active')); 
             b.classList.add('active'); 
             currentCategory = c; 
+            
+            // Прячем все, показываем нужное
+            document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
+            document.getElementById('screen-home').classList.remove('hidden');
+            
             document.getElementById('catalog').classList.remove('hidden');
             document.getElementById('article-view').classList.add('hidden');
             document.getElementById('article-view').style.display = 'none';
@@ -414,8 +450,8 @@
             document.getElementById('m-price').innerText = p.price + ' ₽';
             document.getElementById('m-desc').innerText = p.description || '';
             
-            // ИСПРАВЛЕНИЕ ССЫЛКИ
             const firstImg = p.images ? p.images.split(',')[0].trim() : '';
+            // КОДИРОВКА ССЫЛКИ
             const text = `Привет! Хочу купить ${p.name} (${firstImg})`;
             document.getElementById('m-buy-btn').href = `https://t.me/${myNick}?text=${encodeURIComponent(text)}`;
             
@@ -526,7 +562,7 @@
             if(!currentProduct) return;
             toggleFavLogic(currentProduct.id);
             updateModalFavIcon();
-            if(document.getElementById('screen-fav').style.display !== 'none') renderFavs();
+            if(document.getElementById('screen-fav').classList.contains('hidden') === false) renderFavs();
         }
         function toggleFavLogic(id) {
             if (localStorage.getItem(`fav_${id}`)) {
@@ -581,8 +617,9 @@
             document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            // СКРЫВАЕМ ВСЕ ЭКРАНЫ
-            document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
+            // СКРЫВАЕМ ВСЁ
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-fav').classList.add('hidden');
             
             if (tab === 'home') {
                 document.getElementById('screen-home').classList.remove('hidden');
