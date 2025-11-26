@@ -19,23 +19,34 @@
         }
 
         /* ГЛОБАЛЬНЫЕ НАСТРОЙКИ */
-        html, body { height: 100%; overflow: hidden; }
+        html {
+            height: 100%;
+            overflow: hidden; /* Запрещаем скролл самой страницы */
+            overscroll-behavior: none; /* БЛОКИРУЕМ СВАЙП-ЗАКРЫТИЕ НА УРОВНЕ HTML */
+        }
+        
         body { 
             font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
             background-color: var(--bg); 
             color: var(--text); 
             margin: 0; 
             padding: 0; 
+            height: 100%;
+            overflow: hidden; /* Запрещаем скролл body */
+            overscroll-behavior: none; /* БЛОКИРУЕМ СВАЙП-ЗАКРЫТИЕ */
             -webkit-tap-highlight-color: transparent; 
         }
+        
         ::-webkit-scrollbar { display: none; }
 
         /* --- ГЛАВНЫЙ КОНТЕЙНЕР СКРОЛЛА --- */
+        /* Скроллится только то, что внутри этого контейнера */
         .scroll-container {
             height: 100%;
-            overflow-y: scroll;
+            overflow-y: auto; /* Разрешаем скролл тут */
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 100px; /* Место под таббар */
+            overscroll-behavior-y: contain; /* Скролл остается внутри, не передается наверх */
+            padding-bottom: 100px; 
             box-sizing: border-box;
         }
 
@@ -46,7 +57,7 @@
             z-index: 100; 
             background: rgba(28,28,30,0.98); 
             border-bottom: 0.5px solid rgba(255,255,255,0.1);
-            padding-top: calc(50px + env(safe-area-inset-top)); 
+            padding-top: calc(60px + env(safe-area-inset-top)); 
             padding-bottom: 10px;
         }
 
@@ -103,25 +114,24 @@
         .article-text { font-size: 16px; line-height: 1.6; color: #d1d1d6; white-space: pre-wrap; }
         .article-btn-container { margin-top: 30px; }
 
-        /* --- MODAL (ТОВАР) - СТРУКТУРА FLEX ДЛЯ ФИКСАЦИИ КНОПКИ --- */
+        /* --- MODAL (ТОВАР) --- */
         .modal { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: var(--bg); z-index: 100; 
             transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.1, 0.7, 0.1, 1); 
             display: flex; flex-direction: column; 
-            /* УБРАЛ padding-top ОТСЮДА, ЧТОБЫ УПРАВЛЯТЬ СКРОЛЛОМ ВНУТРИ */
         }
         .modal.open { transform: translateX(0); }
         
         /* ЗОНА СКРОЛЛА (ВЕРХНЯЯ ЧАСТЬ) */
         .modal-scroll-area {
-            flex: 1; /* Занимает всё место, кроме кнопки */
+            flex: 1; 
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            /* ЗАЩИТА ОТ СЛУЧАЙНОГО ЗАКРЫТИЯ СВАЙПОМ */
-            overscroll-behavior: contain; 
-            /* ОТСТУП СВЕРХУ (70px+), чтобы фото не лезло под шапку */
-            padding-top: calc(60px + env(safe-area-inset-top));
+            overscroll-behavior-y: contain; /* ЗАЩИТА ОТ ЗАКРЫТИЯ */
+            
+            /* ВОТ ОН, ГИГАНТСКИЙ ОТСТУП СВЕРХУ (120px) */
+            padding-top: calc(120px + env(safe-area-inset-top));
             padding-left: 20px;
             padding-right: 20px;
             padding-bottom: 20px;
@@ -146,15 +156,14 @@
         .m-price { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: -0.5px;}
         .m-name { font-size: 18px; font-weight: 600; line-height: 1.4; color: #d1d1d6; }
         .separator { height: 1px; background: rgba(255,255,255,0.1); width: 100%; margin: 15px 0; }
-        .m-desc { color: #fff; font-size: 15px; line-height: 1.6; white-space: pre-wrap; opacity: 0.9; padding-bottom: 10px; }
+        .m-desc { color: #fff; font-size: 15px; line-height: 1.6; white-space: pre-wrap; opacity: 0.9; padding-bottom: 20px; }
 
         /* КНОПКА (ФИКСИРОВАННАЯ ВНИЗУ) */
         .modal-actions { 
-            flex-shrink: 0; /* Не сжиматься */
+            flex-shrink: 0; 
             padding: 15px 16px; 
             border-top: 1px solid rgba(255,255,255,0.05); 
             background: var(--bg); 
-            /* ОТСТУП СНИЗУ ДЛЯ АЙФОНОВ (ЧТОБЫ ЧЕРНАЯ ПОЛОСКА НЕ ПЕРЕКРЫВАЛА) */
             padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
             z-index: 101;
         }
@@ -167,10 +176,10 @@
         .lb-item { min-width: 100vw; height: 100%; display: flex; align-items: center; justify-content: center; }
         .lb-item img { max-width: 100%; max-height: 100%; object-fit: contain; }
         
-        /* КРЕСТИК НИЖЕ НА 100px */
+        /* КРЕСТИК И СЧЕТЧИК ОПУЩЕНЫ НА 140px и 150px */
         .close-zoom { 
             position: absolute; 
-            top: 90px; /* БЫЛО 60, СТАЛО 90 */
+            top: 140px; /* ЕЩЕ НИЖЕ */
             right: 20px; 
             width: 44px; 
             height: 44px; 
@@ -183,10 +192,9 @@
             cursor: pointer; 
             font-weight: 300; 
         }
-        /* СЧЕТЧИК НИЖЕ НА 100px */
         .lb-counter { 
             position: absolute; 
-            top: 100px; /* БЫЛО 70, СТАЛО 100 */
+            top: 150px; /* ЕЩЕ НИЖЕ */
             left: 20px; 
             color: white; 
             font-weight: 600; 
@@ -451,7 +459,6 @@
             document.getElementById('m-desc').innerText = p.description || '';
             
             const firstImg = p.images ? p.images.split(',')[0].trim() : '';
-            // КОДИРОВКА ССЫЛКИ
             const text = `Привет! Хочу купить ${p.name} (${firstImg})`;
             document.getElementById('m-buy-btn').href = `https://t.me/${myNick}?text=${encodeURIComponent(text)}`;
             
@@ -617,9 +624,8 @@
             document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            // СКРЫВАЕМ ВСЁ
-            document.getElementById('screen-home').classList.add('hidden');
-            document.getElementById('screen-fav').classList.add('hidden');
+            // СКРЫВАЕМ ВСЕ ЭКРАНЫ
+            document.querySelectorAll('.scroll-container').forEach(el => el.classList.add('hidden'));
             
             if (tab === 'home') {
                 document.getElementById('screen-home').classList.remove('hidden');
